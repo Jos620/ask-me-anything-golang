@@ -1,13 +1,13 @@
 package services
 
 import (
-	"github.com/Jos620/ask-me-anything-golang/internal/entities"
+	"github.com/Jos620/ask-me-anything-golang/internal/models"
 	"github.com/google/uuid"
 )
 
 type RoomsServiceDatabase interface {
-	entities.RoomRepository
-	entities.MessageRepository
+	models.RoomRepository
+	models.MessageRepository
 }
 
 type RoomsService struct {
@@ -20,12 +20,12 @@ func NewRoomsService(db RoomsServiceDatabase) *RoomsService {
 	}
 }
 
-func (s *RoomsService) CreateRoom(theme string) (entities.Room, error) {
+func (s *RoomsService) CreateRoom(theme string) (models.Room, error) {
 	// TODO: validate theme
 	return s.db.CreateRoom(theme)
 }
 
-func (s *RoomsService) GetAllRooms() ([]entities.Room, error) {
+func (s *RoomsService) GetAllRooms() ([]models.Room, error) {
 	rooms, err := s.db.GetAllRooms()
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (s *RoomsService) GetAllRooms() ([]entities.Room, error) {
 	return rooms, nil
 }
 
-func (s *RoomsService) GetRoomMessages(roomID uuid.UUID) ([]entities.Message, error) {
+func (s *RoomsService) GetRoomMessages(roomID uuid.UUID) ([]models.Message, error) {
 	// Validate if the room exists
 	_, err := s.db.GetRoomByID(roomID)
 	if err != nil {

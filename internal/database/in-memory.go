@@ -4,19 +4,19 @@ import (
 	"slices"
 
 	"github.com/Jos620/ask-me-anything-golang/internal/constants"
-	"github.com/Jos620/ask-me-anything-golang/internal/entities"
+	"github.com/Jos620/ask-me-anything-golang/internal/models"
 	"github.com/google/uuid"
 )
 
 type InMemoryDatabase struct {
-	rooms    []entities.Room
-	messages []entities.Message
+	rooms    []models.Room
+	messages []models.Message
 }
 
 func NewInMemoryDatabase() *InMemoryDatabase {
 	return &InMemoryDatabase{
-		rooms:    []entities.Room{},
-		messages: []entities.Message{},
+		rooms:    []models.Room{},
+		messages: []models.Message{},
 	}
 }
 
@@ -27,7 +27,7 @@ func (db *InMemoryDatabase) Seed() {
 		"Health and Wellness",
 	}
 	for _, theme := range roomsThemes {
-		room := entities.Room{
+		room := models.Room{
 			ID:    uuid.New(),
 			Theme: theme,
 		}
@@ -38,7 +38,7 @@ func (db *InMemoryDatabase) Seed() {
 			"Feel free to ask any questions.",
 		}
 		for _, message := range messages {
-			db.messages = append(db.messages, entities.Message{
+			db.messages = append(db.messages, models.Message{
 				ID:      uuid.New(),
 				RoomID:  room.ID,
 				Message: message,
@@ -47,22 +47,22 @@ func (db *InMemoryDatabase) Seed() {
 	}
 }
 
-func (db *InMemoryDatabase) GetAllRooms() ([]entities.Room, error) {
+func (db *InMemoryDatabase) GetAllRooms() ([]models.Room, error) {
 	return db.rooms, nil
 }
 
-func (db *InMemoryDatabase) GetRoomByID(id uuid.UUID) (entities.Room, error) {
+func (db *InMemoryDatabase) GetRoomByID(id uuid.UUID) (models.Room, error) {
 	for _, room := range db.rooms {
 		if room.ID == id {
 			return room, nil
 		}
 	}
 
-	return entities.Room{}, constants.ErrRoomNotFound
+	return models.Room{}, constants.ErrRoomNotFound
 }
 
-func (db *InMemoryDatabase) CreateRoom(theme string) (entities.Room, error) {
-	room := entities.Room{
+func (db *InMemoryDatabase) CreateRoom(theme string) (models.Room, error) {
+	room := models.Room{
 		ID:    uuid.New(),
 		Theme: theme,
 	}
@@ -82,10 +82,10 @@ func (db *InMemoryDatabase) DeleteRoom(id uuid.UUID) error {
 	return constants.ErrRoomNotFound
 }
 
-func (db *InMemoryDatabase) UpdateRoom(id uuid.UUID, theme string) (entities.Room, error) {
+func (db *InMemoryDatabase) UpdateRoom(id uuid.UUID, theme string) (models.Room, error) {
 	for i, room := range db.rooms {
 		if room.ID == id {
-			newRoom := entities.Room{
+			newRoom := models.Room{
 				ID:    id,
 				Theme: theme,
 			}
@@ -95,25 +95,25 @@ func (db *InMemoryDatabase) UpdateRoom(id uuid.UUID, theme string) (entities.Roo
 		}
 	}
 
-	return entities.Room{}, constants.ErrRoomNotFound
+	return models.Room{}, constants.ErrRoomNotFound
 }
 
-func (db *InMemoryDatabase) GetAllMessages() []entities.Message {
+func (db *InMemoryDatabase) GetAllMessages() []models.Message {
 	return db.messages
 }
 
-func (db *InMemoryDatabase) GetMessageByID(id uuid.UUID) (entities.Message, error) {
+func (db *InMemoryDatabase) GetMessageByID(id uuid.UUID) (models.Message, error) {
 	for _, message := range db.messages {
 		if message.ID == id {
 			return message, nil
 		}
 	}
 
-	return entities.Message{}, constants.ErrMessageNotFound
+	return models.Message{}, constants.ErrMessageNotFound
 }
 
-func (db *InMemoryDatabase) GetMessagesByRoomID(roomID uuid.UUID) ([]entities.Message, error) {
-	messages := []entities.Message{}
+func (db *InMemoryDatabase) GetMessagesByRoomID(roomID uuid.UUID) ([]models.Message, error) {
+	messages := []models.Message{}
 	for _, message := range db.messages {
 		if message.RoomID == roomID {
 			messages = append(messages, message)
@@ -123,8 +123,8 @@ func (db *InMemoryDatabase) GetMessagesByRoomID(roomID uuid.UUID) ([]entities.Me
 	return messages, nil
 }
 
-func (db *InMemoryDatabase) CreateMessage(roomID uuid.UUID, message string) (entities.Message, error) {
-	messageEntity := entities.Message{
+func (db *InMemoryDatabase) CreateMessage(roomID uuid.UUID, message string) (models.Message, error) {
+	messageEntity := models.Message{
 		ID:      uuid.New(),
 		RoomID:  roomID,
 		Message: message,
@@ -145,10 +145,10 @@ func (db *InMemoryDatabase) DeleteMessage(id uuid.UUID) error {
 	return constants.ErrMessageNotFound
 }
 
-func (db *InMemoryDatabase) UpdateMessage(id uuid.UUID, message string) (entities.Message, error) {
+func (db *InMemoryDatabase) UpdateMessage(id uuid.UUID, message string) (models.Message, error) {
 	for i, message := range db.messages {
 		if message.ID == id {
-			newMessage := entities.Message{
+			newMessage := models.Message{
 				ID:      id,
 				Message: message.Message,
 			}
@@ -158,10 +158,10 @@ func (db *InMemoryDatabase) UpdateMessage(id uuid.UUID, message string) (entitie
 		}
 	}
 
-	return entities.Message{}, constants.ErrMessageNotFound
+	return models.Message{}, constants.ErrMessageNotFound
 }
 
-func (db *InMemoryDatabase) ReactToMessage(id uuid.UUID) (entities.Message, error) {
+func (db *InMemoryDatabase) ReactToMessage(id uuid.UUID) (models.Message, error) {
 	for i, message := range db.messages {
 		if message.ID == id {
 			message.ReactionCount++
@@ -170,10 +170,10 @@ func (db *InMemoryDatabase) ReactToMessage(id uuid.UUID) (entities.Message, erro
 		}
 	}
 
-	return entities.Message{}, constants.ErrMessageNotFound
+	return models.Message{}, constants.ErrMessageNotFound
 }
 
-func (db *InMemoryDatabase) RemoveReactionFromMessage(id uuid.UUID) (entities.Message, error) {
+func (db *InMemoryDatabase) RemoveReactionFromMessage(id uuid.UUID) (models.Message, error) {
 	for i, message := range db.messages {
 		if message.ID == id {
 			message.ReactionCount--
@@ -182,10 +182,10 @@ func (db *InMemoryDatabase) RemoveReactionFromMessage(id uuid.UUID) (entities.Me
 		}
 	}
 
-	return entities.Message{}, constants.ErrMessageNotFound
+	return models.Message{}, constants.ErrMessageNotFound
 }
 
-func (db *InMemoryDatabase) MarkMessageAsAnswered(id uuid.UUID) (entities.Message, error) {
+func (db *InMemoryDatabase) MarkMessageAsAnswered(id uuid.UUID) (models.Message, error) {
 	for i, message := range db.messages {
 		if message.ID == id {
 			message.Answered = true
@@ -194,5 +194,5 @@ func (db *InMemoryDatabase) MarkMessageAsAnswered(id uuid.UUID) (entities.Messag
 		}
 	}
 
-	return entities.Message{}, constants.ErrMessageNotFound
+	return models.Message{}, constants.ErrMessageNotFound
 }

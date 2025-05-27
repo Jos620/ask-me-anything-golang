@@ -40,9 +40,11 @@ func main() {
 	roomMessagesRouter := roomsRouter.Group(":room_id/messages")
 	roomMessagesRouter.GET("/", handleGetRoomMessages)
 	roomMessagesRouter.POST("/", handleCreateMessage)
-	roomMessagesRouter.PATCH("/answer", handleMarkMessageAsAnswered)
 
-	messageReactionRouter := roomMessagesRouter.Group("/:message_id/react")
+  roomMessageRouter := roomMessagesRouter.Group("/:message_id")
+	roomMessageRouter.PATCH("/answer", handleMarkMessageAsAnswered)
+
+	messageReactionRouter := roomMessageRouter.Group("/react")
 	messageReactionRouter.PATCH("/", handleReactToMessage)
 	messageReactionRouter.DELETE("/", handleRemoveReactionFromMessage)
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Jos620/ask-me-anything-golang/internal/constants"
-	"github.com/Jos620/ask-me-anything-golang/internal/database"
+	"github.com/Jos620/ask-me-anything-golang/internal/database/imdb"
 	"github.com/Jos620/ask-me-anything-golang/internal/services"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	inMemoryDatabase := database.NewInMemoryDatabase()
+	inMemoryDatabase := imdb.NewInMemoryDatabase()
 	inMemoryDatabase.Seed()
 
 	messagesService = *services.NewMessagesService(inMemoryDatabase)

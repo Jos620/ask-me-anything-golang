@@ -2,28 +2,34 @@ package main
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/Jos620/ask-me-anything-golang/internal/constants"
-	"github.com/Jos620/ask-me-anything-golang/internal/database/imdb"
+	"github.com/Jos620/ask-me-anything-golang/internal/database/pgdb"
 	"github.com/Jos620/ask-me-anything-golang/internal/services"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		panic(err)
+	}
+}
 
 var (
 	messagesService services.MessagesService
 	roomsService    services.RoomsService
 )
 
-func init() {
-	inMemoryDatabase := imdb.NewInMemoryDatabase()
-	inMemoryDatabase.Seed()
-
-	messagesService = *services.NewMessagesService(inMemoryDatabase)
-	roomsService = *services.NewRoomsService(inMemoryDatabase)
-}
-
 func main() {
+	postgresDatabase := pgdb.NewPostgresDatabase()
+	defer postgresDatabase.Close()
+
+	messagesService = *services.NewMessagesService(postgresDatabase)
+	roomsService = *services.NewRoomsService(postgresDatabase)
+
 	router := gin.Default()
 	apiRouter := router.Group("/api")
 
@@ -40,7 +46,9 @@ func main() {
 	messageReactionRouter.PATCH("/", handleReactToMessage)
 	messageReactionRouter.DELETE("/", handleRemoveReactionFromMessage)
 
-	router.Run()
+	if err := router.Run(); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
 }
 
 func handleGetAllRooms(ctx *gin.Context) {

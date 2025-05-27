@@ -1,5 +1,8 @@
-start-db:
-	bash ./scripts/start-db.sh
+generate:
+	go generate ./...
 
-generate-pgdb:
-	sqlc generate -f ./configs/sqlc.yaml
+up:
+	bash ./scripts/start-api.sh
+
+down:
+	bash ./scripts/stop-db.sh
